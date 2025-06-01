@@ -8,6 +8,6 @@ public:
 	SDL_FRect rect {};
 	Vector2 speed {};
 	bool isLaunched;
-	Uint64 movetime = 500;
+	float movetime = 0.25;
 	Uint64 Cmovetime = 0; // count moving time
 };

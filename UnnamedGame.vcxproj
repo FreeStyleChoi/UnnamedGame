@@ -145,9 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="easing.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="easing.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>

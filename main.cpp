@@ -1,6 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS 1
 #include "Player.h"
 #include "Util.h"
+#include "easing.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
@@ -13,6 +14,7 @@ static SDL_Renderer* renderer = NULL;
 #define WINDOW_HEIGHT 720
 
 Player player = { 0 };
+auto playerEasing = getEasingFunction(EaseOutExpo);
 
 SDL_FRect BackgroundRect[2] = {};
 SDL_Texture* BackgroundTexture = NULL;
@@ -65,7 +67,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 	}
 	if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 	{
-		player.Cmovetime = SDL_GetTicks();
 		player.isLaunched = true;
 	}
 	return SDL_APP_CONTINUE;
@@ -88,18 +89,22 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 	}
 
+	// player
 	if (player.isLaunched == true)
 	{
-		if (player.Cmovetime + player.movetime <= SDL_GetTicks())
+		if (player.Cmovetime >= player.movetime)
 		{
+			player.Cmovetime = 0;
 			player.isLaunched = false;
 			player.speed.x = 0;
 		}
 		else
 		{
-			player.speed.x = 3;
+			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 10;
+			player.Cmovetime++;
 		}
 	}
+	SDL_Log("%f\n", playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 10);
 
 
 	// camera
