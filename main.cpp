@@ -1,30 +1,23 @@
-/* rectangles.c ... */
-
-/*
- * This example creates an SDL window and renderer, and then draws some
- * rectangles to it every frame.
- *
- * This code is public domain. Feel free to use it for any purpose!
- */
-
-#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#define SDL_MAIN_USE_CALLBACKS 1
 #include "Player.h"
 #include "Util.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
 
- /* We will use this renderer to draw into this window every frame. */
+
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-#define CAMERASPEED 3
-
 Player player = { 0 };
 
-const unsigned int FPS = 120;  /* frames per second */
+SDL_FRect BackgroundRect[2] = {};
+SDL_Texture* BackgroundTexture = NULL;
+
+const unsigned int FPS = 120;
 
 Uint64 FrameStart = 0;
 Uint64 FrameTime = 0;
@@ -44,6 +37,13 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
+
+	SDL_Surface* tmpSurface = IMG_Load("./asset/background.jpg");
+	BackgroundTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+	SDL_DestroySurface(tmpSurface);
+
+	BackgroundRect[0] = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	BackgroundRect[1] = { WINDOW_WIDTH, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
 	player.rect.w = 32;
 	player.rect.h = 32;
@@ -74,7 +74,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-	FrameStart = SDL_GetTicks(); 
+	FrameStart = SDL_GetTicks();
 
 	if (player.isLaunched == true)
 	{
@@ -85,23 +85,28 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 		else
 		{
-			player.speed.x = CAMERASPEED;
+			player.speed.x = 3;
 		}
 	}
 
 
 	// camera
-
+	player.rect.x -= player.speed.x;
+	for (int i = 0; i < 2; i++)
+	{
+		BackgroundRect[i].x -= player.speed.x;
+	}
 
 
 	player.rect.x += player.speed.x;
 	player.rect.y += player.speed.y;
 
-
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
+	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
+	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(renderer, &player.rect);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderPresent(renderer);
 
 	FrameTime = SDL_GetTicks() - FrameStart;
@@ -116,6 +121,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-
+	SDL_DestroyTexture(BackgroundTexture);
 }
 
