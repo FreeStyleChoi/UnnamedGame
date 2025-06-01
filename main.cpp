@@ -47,8 +47,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	player.rect.w = 32;
 	player.rect.h = 32;
-	player.rect.x = 128;
-	player.rect.y = (WINDOW_HEIGHT / 2) - (player.rect.h / 32);
+	player.rect.x = (WINDOW_WIDTH / 2) - (player.rect.w / 2);
+	player.rect.y = (WINDOW_HEIGHT / 2) - (player.rect.h / 2);
 	player.speed.x = 0;
 	player.speed.y = 0;
 	player.movetime = 500;
@@ -75,6 +75,18 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
 	FrameStart = SDL_GetTicks();
+
+	// background
+	for (int i = 0; i < 2; i++)
+	{
+		if (BackgroundRect[i].x + BackgroundRect[i].w <= 0)
+		{
+			if (i == 0)
+				BackgroundRect[i].x = BackgroundRect[i + 1].x + BackgroundRect[i].w;
+			else
+				BackgroundRect[i].x = BackgroundRect[i - 1].x + BackgroundRect[i].w;
+		}
+	}
 
 	if (player.isLaunched == true)
 	{
