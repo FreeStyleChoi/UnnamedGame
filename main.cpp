@@ -68,6 +68,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 	if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 	{
 		player.isLaunched = true;
+		player.Cmovetime = 0;
 	}
 	return SDL_APP_CONTINUE;
 }
@@ -94,13 +95,12 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	{
 		if (player.Cmovetime >= player.movetime)
 		{
-			player.Cmovetime = 0;
 			player.isLaunched = false;
 			player.speed.x = 0;
 		}
 		else
 		{
-			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 10;
+			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 15;
 			player.Cmovetime++;
 		}
 	}
