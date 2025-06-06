@@ -6,7 +6,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
-
+#include <algorithm>
+#include <iostream>
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
@@ -128,6 +129,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	// mouse
 	SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
+	// mouse clamp
+	//mousePos.x = std::clamp((int)mousePos.x, 0, (int)player.rect.x);
+
 	// camera
 	player.rect.x -= player.speed.x;
 	for (int i = 0; i < 2; i++)
@@ -142,14 +146,13 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderClear(renderer);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
-	SDL_SetRenderDrawColor(renderer, 169, 187, 252, SDL_ALPHA_OPAQUE);
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	if (bullet.isShooting)
 	{
-		Util_RenderThickLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2) - (16 / 2), mousePos.x, mousePos.y, 16, { 255, 0, 0, SDL_ALPHA_OPAQUE });
+		Util_RenderThickLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2) - (16 / 2), mousePos.x , mousePos.y, 16, { 169, 187, 252, SDL_ALPHA_OPAQUE });
 	}
 	else
 	{
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2), mousePos.x, mousePos.y);
 	}
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
