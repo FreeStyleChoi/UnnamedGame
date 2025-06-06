@@ -29,6 +29,8 @@ Uint64 FrameTime = 0;
 Uint64 FrameCount = 0;
 Uint64 FrameDelay = 1000 / FPS;
 
+FVector2 mousePos;
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
 	SDL_SetAppMetadata("Unnamed Game", "dev1", "com.FreestyleGameStudio.UnnamedGame");
@@ -140,6 +142,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		bullet.rect.y = player.rect.y + (player.rect.h / 2) - (bullet.rect.h / 2);
 	}
 
+	// mouse
+	SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
 	// camera
 	player.rect.x -= player.speed.x;
 	//bullet.rect.x -= player.speed.x;
@@ -157,6 +162,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
 	SDL_SetRenderDrawColor(renderer, 169, 187, 252, SDL_ALPHA_OPAQUE);
 	SDL_RenderTexture(renderer, bullet.texture, NULL, &bullet.rect);
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2), mousePos.x, mousePos.y);
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(renderer, &player.rect);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
