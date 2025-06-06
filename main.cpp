@@ -148,11 +148,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
 	if (bullet.isShooting)
 	{
-		Util_RenderThickLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2) - (16 / 2), mousePos.x , mousePos.y, 16, { 169, 187, 252, SDL_ALPHA_OPAQUE });
+		Util_RenderThickLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2) - (16 / 2), mousePos.x , mousePos.y, 16, { 0, 0, 255, SDL_ALPHA_OPAQUE });
 	}
 	else
 	{
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2), mousePos.x, mousePos.y);
 	}
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
