@@ -5,8 +5,6 @@
 
 class Bullet {
 public:
-	SDL_FRect rect;
-	Vector2 speed;
-	SDL_Texture* texture;
+	Vector2 size;
 	bool isShooting;
 };
