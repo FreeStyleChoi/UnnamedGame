@@ -1,5 +1,6 @@
 #define SDL_MAIN_USE_CALLBACKS 1
 #include "Player.h"
+#include "Bullet.h"
 #include "Util.h"
 #include "easing.h"
 #include <SDL3/SDL.h>
@@ -15,6 +16,8 @@ static SDL_Renderer* renderer = NULL;
 
 Player player = { 0 };
 auto playerEasing = getEasingFunction(EaseOutExpo);
+
+Bullet bullet = { 0 };
 
 SDL_FRect BackgroundRect[2] = {};
 SDL_Texture* BackgroundTexture = NULL;
@@ -56,6 +59,15 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	player.movetime = 500;
 	player.Cmovetime = 0;
 
+	tmpSurface = IMG_Load("./asset/lazer.jpg");
+	bullet.texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+	SDL_DestroySurface(tmpSurface);
+	bullet.rect.w = 1;
+	bullet.rect.h = 16;
+	bullet.rect.x = player.rect.x;
+	bullet.rect.y = player.rect.y + (player.rect.h / 2) - (bullet.rect.h / 2);
+	bullet.isShooting = false;
+
 	return SDL_APP_CONTINUE; 
 }
 
@@ -67,8 +79,14 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 	}
 	if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 	{
+		player.Cmovetime = -1; // 누르는 동안에는 움직인다는 플래그
 		player.isLaunched = true;
+		bullet.isShooting = true;
+	}
+	if (event->type == SDL_EVENT_MOUSE_BUTTON_UP)
+	{
 		player.Cmovetime = 0;
+		bullet.isShooting = false;
 	}
 	return SDL_APP_CONTINUE;
 }
@@ -91,7 +109,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	}
 
 	// player
-	if (player.isLaunched == true)
+	if (player.isLaunched == true && player.Cmovetime != -1)
 	{
 		if (player.Cmovetime >= player.movetime)
 		{
@@ -100,15 +118,31 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 		else
 		{
-			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 15;
+			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 8;
 			player.Cmovetime++;
 		}
 	}
-	SDL_Log("%f\n", playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 10);
+	else if (player.isLaunched == true && player.Cmovetime == -1)
+	{
+		player.speed.x = 8; // 계속 움직임
+	}
 
+	// bullet
+	if (bullet.isShooting)
+	{
+		bullet.rect.x -= player.speed.x * 3; // 총알은 플레이어의 2배 속도로 이동
+		bullet.rect.w += player.speed.x * 3; // 총알의 궤적도 플레이어의 2배 속도로 증가
+	}
+	if (!bullet.isShooting)
+	{
+		bullet.rect.w = 1;
+		bullet.rect.x = player.rect.x;
+		bullet.rect.y = player.rect.y + (player.rect.h / 2) - (bullet.rect.h / 2);
+	}
 
 	// camera
 	player.rect.x -= player.speed.x;
+	//bullet.rect.x -= player.speed.x;
 	for (int i = 0; i < 2; i++)
 	{
 		BackgroundRect[i].x -= player.speed.x;
@@ -121,6 +155,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderClear(renderer);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
+	SDL_SetRenderDrawColor(renderer, 169, 187, 252, SDL_ALPHA_OPAQUE);
+	SDL_RenderTexture(renderer, bullet.texture, NULL, &bullet.rect);
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(renderer, &player.rect);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);

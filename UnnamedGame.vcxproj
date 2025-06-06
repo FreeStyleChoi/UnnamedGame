@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bullet.h" />
     <ClCompile Include="easing.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
