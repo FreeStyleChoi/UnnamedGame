@@ -1,6 +1,8 @@
 #define SDL_MAIN_USE_CALLBACKS 1
+#define TARGETMAX 8
 #include "Player.h"
 #include "Bullet.h"
+#include "Target.h"
 #include "Util.h"
 #include "easing.h"
 #include <SDL3/SDL.h>
@@ -19,6 +21,8 @@ Player player = { 0 };
 auto playerEasing = getEasingFunction(EaseOutExpo);
 
 Bullet bullet = { 0 };
+
+Target target[TARGETMAX] = { 0 };
 
 SDL_FRect BackgroundRect[2] = {};
 SDL_Texture* BackgroundTexture = NULL;
@@ -62,10 +66,20 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	player.movetime = 500;
 	player.Cmovetime = 0;
 
-	bullet.size.x = 1;
-	bullet.size.y = 16;
-
 	bullet.isShooting = false;
+
+	// TODO Target 초기화
+	for (int i = 0; i < TARGETMAX; i++)
+	{
+		target[i].OnScreen = true;
+		target[i].rect.w = 64;
+		target[i].rect.h = 64;
+		target[i].rect.x = 0;
+		target[i].rect.y = 0;
+	}
+	// TODO Target 맵 제작
+	// TODO Target 매핑
+	// TODO Target 렌더링
 
 	return SDL_APP_CONTINUE; 
 }
@@ -157,6 +171,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	}
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(renderer, &player.rect);
+	target[0].render(renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderPresent(renderer);
 

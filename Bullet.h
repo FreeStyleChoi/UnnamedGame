@@ -5,6 +5,5 @@
 
 class Bullet {
 public:
-	Vector2 size;
 	bool isShooting;
 };
