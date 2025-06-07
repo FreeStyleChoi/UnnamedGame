@@ -1,7 +1,9 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include "Util.h"
-#include <fstream>
+#include <cstdio>
 #include <cstdint>
+#include <string>
 #include <SDL3/SDL.h>
 
 class Target
@@ -16,6 +18,6 @@ class Map
 {
 public:
 	int16_t length = 0;
-	int8_t data[INT16_MAX] {};
+	int8_t data[INT16_MAX + 1] {};
 	void getDataFromFile(const char* filename);
 };

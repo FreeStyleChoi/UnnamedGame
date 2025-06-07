@@ -45,7 +45,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		return SDL_APP_FAILURE;
 	}
 
-	if (!SDL_CreateWindowAndRenderer("Unnamed Game", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
+	if (!SDL_CreateWindowAndRenderer("Unnamed Game", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
 		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
@@ -68,7 +68,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	bullet.isShooting = false;
 
-	// TODO Target 초기화
 	for (int i = 0; i < TARGETMAX; i++)
 	{
 		target[i].OnScreen = true;
@@ -78,6 +77,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		target[i].rect.y = 0;
 	}
 	// TODO Target 맵 제작
+	Map targetMap;
+	targetMap.getDataFromFile("./asset/map1.txt");
 	// TODO Target 매핑
 	// TODO Target 렌더링
 
@@ -86,7 +87,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
-	if (event->type == SDL_EVENT_QUIT)
+	if (event->type == SDL_EVENT_QUIT || event->key.key == SDLK_ESCAPE)
 	{
 		return SDL_APP_SUCCESS;
 	}
@@ -160,6 +161,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderClear(renderer);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
+	target[0].render(renderer);
 	if (bullet.isShooting)
 	{
 		Util_RenderThickLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2) - (16 / 2), mousePos.x , mousePos.y, 16, { 0, 0, 255, SDL_ALPHA_OPAQUE });
@@ -171,7 +173,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	}
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(renderer, &player.rect);
-	target[0].render(renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderPresent(renderer);
 

@@ -11,18 +11,23 @@ void Target::render(SDL_Renderer* renderer)
 
 void Map::getDataFromFile(const char* fileDirName)
 {
-	std::ifstream rawData(fileDirName, std::ios::in);
-	if (rawData.fail())
-		SDL_Log("cannot open map file: %s", fileDirName);
-
-	char Slength[6] = { 0 }; // one byte for sign, 5 bytes for length
-	if (rawData.is_open())
+	FILE* rawData = fopen(fileDirName, "r");
+	if (rawData == NULL)
 	{
-		while (rawData.getline(Slength, 6))
-		{
-			this->length = std::atoi(Slength);
-		}
+		SDL_Log("Cannot open map file: %s", fileDirName);
+		return;
 	}
-
-	rawData.close();
+	else
+	
+	fscanf(rawData, "%d", &this->length);
+	SDL_Log("Map length: %d", this->length);
+	fseek(rawData, 2, SEEK_CUR);
+	for (int i = 0; i < this->length; i++)
+	{
+		char cData = '\0';
+		cData = getc(rawData);
+		this->data[i] = cData - '0'; // convert character to integer
+		SDL_Log("data[%d] = %d", i, this->data[i]);
+	}
+	fclose(rawData);
 }
