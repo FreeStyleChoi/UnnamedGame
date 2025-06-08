@@ -39,20 +39,29 @@ void Map::setPosFromData(int index, Target& target)
  {
 	switch (this->data[index])
 	{
-	case 0:
-		target.OnScreen = false;
+	case 1: // y=0
+		target.OnScreen = true;
+		target.rect.x = WINDOW_WIDTH + (index * 128);
+		target.rect.y = 0;
 		break;
-	case 1: // target is in top side of screen
+	case 2: // y=128
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
 		target.rect.y = 128;
 		break;
-	case 2: // target is in bottom side of screen
+	case 3: // y = WINDOW_HEIGHT - 256
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
-		target.rect.y = WINDOW_HEIGHT - 128 - 128;
+		target.rect.y = WINDOW_HEIGHT - 256;
 		break;
+	case 4: // y = WINDOW_HEIGHT - 128
+		target.OnScreen = true;
+		target.rect.x = WINDOW_WIDTH + (index * 128);
+		target.rect.y = WINDOW_HEIGHT - 128;
+		break;
+	case 0:
 	default:
+		target.OnScreen = false;
 		break;
 	}
 }
