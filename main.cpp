@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Bullet.h"
 #include "Util.h"
+#include "Target.h"
 #include "easing.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -11,9 +12,6 @@
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
-
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
 
 Player player = { 0 };
 auto playerEasing = getEasingFunction(EaseOutExpo);
@@ -31,6 +29,9 @@ Uint64 FrameCount = 0;
 Uint64 FrameDelay = 1000 / FPS;
 
 FVector2 mousePos;
+
+Map targetMap{ 0 };
+Target target[INT16_MAX]{ 0 };
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -66,6 +67,27 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	bullet.size.y = 16;
 
 	bullet.isShooting = false;
+
+	targetMap.getDataFromFile("./asset./map1.txt");
+	for (int i = 0; i < targetMap.length; i++)
+	{
+		target[i].OnScreen = true;
+		target[i].rect.w = 64;
+		target[i].rect.h = 64;
+		target[i].rect.x = 0;
+		target[i].rect.y = 0;
+		targetMap.setPosFromData(i, target[i]);
+		if (targetMap.data[i] == 0)
+		{
+			target[i].OnScreen = false;
+			target[i].rect.x = WINDOW_WIDTH;
+		}
+		else if (targetMap.data[i] == 1)
+			target[i].rect.y = 128;
+		else if (targetMap.data[i] == 2)
+			target[i].rect.y = WINDOW_HEIGHT - 128;
+	}
+
 
 	return SDL_APP_CONTINUE; 
 }
@@ -117,13 +139,13 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 		else
 		{
-			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 12;
+			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 8;
 			player.Cmovetime++;
 		}
 	}
 	else if (player.isLaunched == true && player.Cmovetime == -1)
 	{
-		player.speed.x = 12; // 계속 움직임
+		player.speed.x = 8; // 계속 움직임
 	}
 
 	// mouse
@@ -138,7 +160,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	{
 		BackgroundRect[i].x -= player.speed.x;
 	}
-
+	for (int i = 0; i < targetMap.length; i++)
+	{
+		if (target[i].OnScreen)
+			target[i].rect.x -= player.speed.x;
+	}
 
 	player.rect.x += player.speed.x;
 	player.rect.y += player.speed.y;
@@ -146,6 +172,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderClear(renderer);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
 	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
+	for (int i = 0; i < targetMap.length; i++)
+	{
+		target[i].render(renderer);
+	}
 	if (bullet.isShooting)
 	{
 		Util_RenderThickLine(renderer, player.rect.x, player.rect.y + (player.rect.h / 2) - (16 / 2), mousePos.x , mousePos.y, 16, { 0, 0, 255, SDL_ALPHA_OPAQUE });

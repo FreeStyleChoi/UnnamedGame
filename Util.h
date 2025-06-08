@@ -1,6 +1,9 @@
 #pragma once
 #include <SDL3/SDL.h>
 
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
+
 class Vector2
 {
 public:
