@@ -21,8 +21,7 @@ void Map::getDataFromFile(const char* fileDirName)
 		return;
 	}
 	else
-
-		fscanf(rawData, "%d", &this->length);
+		fscanf(rawData, "%5d", &this->length);
 	SDL_Log("Map length: %d", this->length);
 	fseek(rawData, 2, SEEK_CUR);
 	for (int i = 0; i < this->length; i++)
@@ -30,12 +29,12 @@ void Map::getDataFromFile(const char* fileDirName)
 		char cData = '\0';
 		cData = getc(rawData);
 		this->data[i] = cData - '0'; // convert character to integer
-		SDL_Log("data[%d] = %d", i, this->data[i]);
+		//SDL_Log("data[%d] = %d", i, this->data[i]);
 	}
 	fclose(rawData);
 }
 
-void Map::setPosFromData(int index, Target& target)
+void Map::setPosFromData(int index, Target& target, int* activeTargets)
  {
 	switch (this->data[index])
 	{
@@ -43,21 +42,25 @@ void Map::setPosFromData(int index, Target& target)
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
 		target.rect.y = 0;
+		*activeTargets += 1;
 		break;
 	case 2: // y=128
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
 		target.rect.y = 128;
+		*activeTargets += 1;
 		break;
 	case 3: // y = WINDOW_HEIGHT - 256
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
 		target.rect.y = WINDOW_HEIGHT - 256;
+		*activeTargets += 1;
 		break;
 	case 4: // y = WINDOW_HEIGHT - 128
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
 		target.rect.y = WINDOW_HEIGHT - 128;
+		*activeTargets += 1;
 		break;
 	case 0:
 	default:

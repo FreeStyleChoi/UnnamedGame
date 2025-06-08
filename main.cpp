@@ -1,3 +1,5 @@
+// TODO 점수가 표적 맞출떄 한번만 올라가게 만들기!!!
+
 #define SDL_MAIN_USE_CALLBACKS 1
 #include "Player.h"
 #include "Bullet.h"
@@ -32,6 +34,8 @@ FVector2 mousePos;
 
 Map targetMap{ 0 };
 Target target[INT16_MAX]{ 0 };
+int activeTargets;
+int score;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -68,6 +72,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	bullet.isShooting = false;
 
+	score = 0;
+	activeTargets = 0;
+
 	targetMap.getDataFromFile("./asset./map.txt");
 	for (int i = 0; i < targetMap.length; i++)
 	{
@@ -77,13 +84,14 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		target[i].rect.h = 128;
 		target[i].rect.x = 0;
 		target[i].rect.y = 0;
-		targetMap.setPosFromData(i, target[i]);
+		targetMap.setPosFromData(i, target[i], &activeTargets);
 		if (targetMap.data[i] == 0)
 		{
 			target[i].OnScreen = false;
 			target[i].rect.x = WINDOW_WIDTH;
 		}
 	}
+	SDL_Log("%d", activeTargets);
 
 
 	return SDL_APP_CONTINUE; 
@@ -150,9 +158,12 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	{
 		if (target[i].rect.x < mousePos.x && target[i].rect.x + target[i].rect.w > mousePos.x && target[i].rect.y < mousePos.y && target[i].rect.y + target[i].rect.h > mousePos.y  &&  bullet.isShooting) // first one check x pos, second check y pos, and another check mouse clicked
 		{
+			score++;
 			target[i].isHitted = true;
 		}
 	}
+
+	SDL_Log("score: %d | %f%%", score, ((float)score / (float)activeTargets) * 100.0);
 
 	// mouse
 	SDL_GetMouseState(&mousePos.x, &mousePos.y);

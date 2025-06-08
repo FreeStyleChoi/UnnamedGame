@@ -21,5 +21,5 @@ public:
 	int16_t length = 0;
 	int8_t data[INT16_MAX]{};
 	void getDataFromFile(const char* filename);
-	void setPosFromData(int index, Target& target);
+	void setPosFromData(int index, Target& target, int* activeTargets);
 };
