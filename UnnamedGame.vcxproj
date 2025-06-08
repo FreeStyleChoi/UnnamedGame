@@ -150,6 +150,7 @@
     <ClCompile Include="Bullet.h" />
     <ClCompile Include="easing.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Target.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>

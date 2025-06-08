@@ -12,9 +12,6 @@
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
-
 Player player = { 0 };
 auto playerEasing = getEasingFunction(EaseOutExpo);
 
