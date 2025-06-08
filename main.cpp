@@ -68,7 +68,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	bullet.isShooting = false;
 
-	targetMap.getDataFromFile("./asset./map1.txt");
+	targetMap.getDataFromFile("./asset./map.txt");
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		target[i].OnScreen = true;
