@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720

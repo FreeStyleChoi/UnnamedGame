@@ -1,6 +1,7 @@
 // TODO 점수가 표적 맞출떄 한번만 올라가게 만들기!!!
 
 #define SDL_MAIN_USE_CALLBACKS 1
+#define _CRT_SECURE_NO_WARNINGS
 #include "Player.h"
 #include "Bullet.h"
 #include "Util.h"
@@ -9,7 +10,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
-#include <algorithm>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <cstring>
 #include <iostream>
 
 static SDL_Window* window = NULL;
@@ -37,6 +39,8 @@ Target target[INT16_MAX]{ 0 };
 int activeTargets;
 int score;
 
+TTF_Font* scoreFont = NULL;
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
 	SDL_SetAppMetadata("Unnamed Game", "dev1", "com.FreestyleGameStudio.UnnamedGame");
@@ -48,6 +52,17 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	if (!SDL_CreateWindowAndRenderer("Unnamed Game", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
 		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+		return SDL_APP_FAILURE;
+	}
+
+	if (!TTF_Init()) {
+		SDL_Log("Couldn't initialize TTF: %s", SDL_GetError());
+		return SDL_APP_FAILURE;
+	}
+	scoreFont = TTF_OpenFont("./asset/font.ttf", 64);
+	if (scoreFont == NULL)
+	{
+		SDL_Log("asdf");
 		return SDL_APP_FAILURE;
 	}
 
@@ -156,7 +171,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	// target
 	for (int i = 0; i < targetMap.length; i++)
 	{
-		if (target[i].rect.x < mousePos.x && target[i].rect.x + target[i].rect.w > mousePos.x && target[i].rect.y < mousePos.y && target[i].rect.y + target[i].rect.h > mousePos.y  &&  bullet.isShooting) // first one check x pos, second check y pos, and another check mouse clicked
+		if (target[i].rect.x < mousePos.x && target[i].rect.x + target[i].rect.w > mousePos.x && target[i].rect.y < mousePos.y && target[i].rect.y + target[i].rect.h > mousePos.y  &&  bullet.isShooting && !target[i].isHitted) // first one check x pos, second check y pos, and another check mouse clicked
 		{
 			score++;
 			target[i].isHitted = true;
@@ -189,6 +204,21 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderClear(renderer);
 	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
 	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
+
+	//char t[8] = "Score: ";
+	//char t2[6] = "\0";
+	//_itoa(score, t2, 6);
+	//char* scoreText;
+	//scoreText = strcat(t, t2);
+	// TODO 점수 화면에 출력하기
+	char scoreText[32] = "Score: ";
+	SDL_Surface* textSurface = TTF_RenderText_Blended(scoreFont, scoreText, 50, {255, 255, 255, SDL_ALPHA_OPAQUE});
+	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+	SDL_DestroySurface(textSurface);
+	SDL_FRect textRect = { 256, 256, textTexture->w, textTexture->h };
+	SDL_RenderTexture(renderer, textTexture, NULL, &textRect);
+	SDL_DestroyTexture(textTexture);
+
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		target[i].render(renderer);
@@ -219,6 +249,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
+	TTF_CloseFont(scoreFont);
 	//SDL_DestroyTexture(BackgroundTexture);
 }
 
