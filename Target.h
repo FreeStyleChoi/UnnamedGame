@@ -11,6 +11,7 @@ class Target
 public:
 	SDL_FRect rect{};
 	bool OnScreen = false;
+	bool isHitted = false;
 	void render(SDL_Renderer* renderer);
 };
 

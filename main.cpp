@@ -18,8 +18,8 @@ auto playerEasing = getEasingFunction(EaseOutExpo);
 
 Bullet bullet = { 0 };
 
-SDL_FRect BackgroundRect[2] = {};
-SDL_Texture* BackgroundTexture = NULL;
+//SDL_FRect BackgroundRect[2] = {};
+//SDL_Texture* BackgroundTexture = NULL;
 
 const unsigned int FPS = 120;
 
@@ -47,12 +47,12 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		return SDL_APP_FAILURE;
 	}
 
-	SDL_Surface* tmpSurface = IMG_Load("./asset/background.jpg");
-	BackgroundTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-	SDL_DestroySurface(tmpSurface);
+	//SDL_Surface* tmpSurface = IMG_Load("./asset/background.jpg");
+	//BackgroundTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+	//SDL_DestroySurface(tmpSurface);
 
-	BackgroundRect[0] = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-	BackgroundRect[1] = { WINDOW_WIDTH, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	//BackgroundRect[0] = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	//BackgroundRect[1] = { WINDOW_WIDTH, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
 	player.rect.w = 32;
 	player.rect.h = 32;
@@ -72,8 +72,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		target[i].OnScreen = true;
-		target[i].rect.w = 64;
-		target[i].rect.h = 64;
+		target[i].isHitted = false;
+		target[i].rect.w = 128;
+		target[i].rect.h = 128;
 		target[i].rect.x = 0;
 		target[i].rect.y = 0;
 		targetMap.setPosFromData(i, target[i]);
@@ -82,10 +83,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 			target[i].OnScreen = false;
 			target[i].rect.x = WINDOW_WIDTH;
 		}
-		else if (targetMap.data[i] == 1)
-			target[i].rect.y = 128;
-		else if (targetMap.data[i] == 2)
-			target[i].rect.y = WINDOW_HEIGHT - 128;
 	}
 
 
@@ -118,16 +115,16 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	FrameStart = SDL_GetTicks();
 
 	// background
-	for (int i = 0; i < 2; i++)
-	{
-		if (BackgroundRect[i].x + BackgroundRect[i].w <= 0)
-		{
-			if (i == 0)
-				BackgroundRect[i].x = BackgroundRect[i + 1].x + BackgroundRect[i].w;
-			else
-				BackgroundRect[i].x = BackgroundRect[i - 1].x + BackgroundRect[i].w;
-		}
-	}
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	if (BackgroundRect[i].x + BackgroundRect[i].w <= 0)
+	//	{
+	//		if (i == 0)
+	//			BackgroundRect[i].x = BackgroundRect[i + 1].x + BackgroundRect[i].w;
+	//		else
+	//			BackgroundRect[i].x = BackgroundRect[i - 1].x + BackgroundRect[i].w;
+	//	}
+	//}
 
 	// player
 	if (player.isLaunched == true && player.Cmovetime != -1)
@@ -139,13 +136,22 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 		else
 		{
-			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 8;
+			player.speed.x = playerEasing((double)(player.Cmovetime * FrameDelay) / 1000.0) * 10;
 			player.Cmovetime++;
 		}
 	}
 	else if (player.isLaunched == true && player.Cmovetime == -1)
 	{
-		player.speed.x = 8; // 계속 움직임
+		player.speed.x = 10; // 계속 움직임
+	}
+
+	// target
+	for (int i = 0; i < targetMap.length; i++)
+	{
+		if (target[i].rect.x < mousePos.x && target[i].rect.x + target[i].rect.w > mousePos.x && target[i].rect.y < mousePos.y && target[i].rect.y + target[i].rect.h > mousePos.y  &&  bullet.isShooting) // first one check x pos, second check y pos, and another check mouse clicked
+		{
+			target[i].isHitted = true;
+		}
 	}
 
 	// mouse
@@ -156,10 +162,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
 	// camera
 	player.rect.x -= player.speed.x;
-	for (int i = 0; i < 2; i++)
-	{
-		BackgroundRect[i].x -= player.speed.x;
-	}
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	BackgroundRect[i].x -= player.speed.x;
+	//}
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		if (target[i].OnScreen)
@@ -170,8 +176,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	player.rect.y += player.speed.y;
 
 	SDL_RenderClear(renderer);
-	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
-	SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
+	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
+	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		target[i].render(renderer);
@@ -202,6 +208,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-	SDL_DestroyTexture(BackgroundTexture);
+	//SDL_DestroyTexture(BackgroundTexture);
 }
 

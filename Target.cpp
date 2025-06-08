@@ -5,7 +5,10 @@ void Target::render(SDL_Renderer* renderer)
 	if (this->OnScreen)
 	{
 		SDL_SetRenderDrawColor(renderer, 255, 0, 255, SDL_ALPHA_OPAQUE);
-		SDL_RenderFillRect(renderer, &this->rect);
+		if (this->isHitted)
+			SDL_RenderFillRect(renderer, &this->rect);
+		else
+			SDL_RenderRect(renderer, &this->rect);
 	}
 }
 
@@ -33,7 +36,7 @@ void Map::getDataFromFile(const char* fileDirName)
 }
 
 void Map::setPosFromData(int index, Target& target)
-{
+ {
 	switch (this->data[index])
 	{
 	case 0:
@@ -41,13 +44,13 @@ void Map::setPosFromData(int index, Target& target)
 		break;
 	case 1: // target is in top side of screen
 		target.OnScreen = true;
-		target.rect.x = WINDOW_WIDTH + (index * 64);
+		target.rect.x = WINDOW_WIDTH + (index * 128);
 		target.rect.y = 128;
 		break;
 	case 2: // target is in bottom side of screen
 		target.OnScreen = true;
-		target.rect.x = WINDOW_WIDTH + (index * 64);
-		target.rect.y = WINDOW_HEIGHT - 128;
+		target.rect.x = WINDOW_WIDTH + (index * 128);
+		target.rect.y = WINDOW_HEIGHT - 128 - 128;
 		break;
 	default:
 		break;
