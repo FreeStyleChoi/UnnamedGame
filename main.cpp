@@ -7,7 +7,6 @@
 #include "easing.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <cstring>
 #include <iostream>
@@ -19,9 +18,6 @@ Player player = { 0 };
 auto playerEasing = getEasingFunction(EaseOutExpo);
 
 Bullet bullet = { 0 };
-
-//SDL_FRect BackgroundRect[2] = {};
-//SDL_Texture* BackgroundTexture = NULL;
 
 const unsigned int FPS = 120;
 
@@ -40,7 +36,6 @@ int score;
 int scorePercent;
 
 TTF_Font* font = NULL;
-TTF_Font* _font = NULL;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -61,23 +56,11 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		return SDL_APP_FAILURE;
 	}
 	font = TTF_OpenFont("./asset/font.ttf", 64);
-	_font = TTF_OpenFont("./asset/font.ttf", 64);
 	if (font == NULL)
 	{
 		SDL_Log("asdf");
 		return SDL_APP_FAILURE;
 	}
-	if (_font == NULL)
-	{
-		SDL_Log("asdf");
-		return SDL_APP_FAILURE;
-	}
-	//SDL_Surface* tmpSurface = IMG_Load("./asset/background.jpg");
-	//BackgroundTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-	//SDL_DestroySurface(tmpSurface);
-
-	//BackgroundRect[0] = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-	//BackgroundRect[1] = { WINDOW_WIDTH, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
 	player.rect.w = 32;
 	player.rect.h = 32;
@@ -143,18 +126,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 {
 	FrameStart = SDL_GetTicks();
 
-	// background
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	if (BackgroundRect[i].x + BackgroundRect[i].w <= 0)
-	//	{
-	//		if (i == 0)
-	//			BackgroundRect[i].x = BackgroundRect[i + 1].x + BackgroundRect[i].w;
-	//		else
-	//			BackgroundRect[i].x = BackgroundRect[i - 1].x + BackgroundRect[i].w;
-	//	}
-	//}
-
 	// player
 	if (player.isLaunched == true && player.Cmovetime != -1)
 	{
@@ -190,15 +161,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	// mouse
 	SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
-	// mouse clamp
-	//mousePos.x = std::clamp((int)mousePos.x, 0, (int)player.rect.x);
-
 	// camera
 	player.rect.x -= player.speed.x;
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	BackgroundRect[i].x -= player.speed.x;
-	//}
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		if (target[i].OnScreen)
@@ -209,14 +173,16 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	player.rect.y += player.speed.y;
 
 	SDL_RenderClear(renderer);
-	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
-	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
 
 	// score
 	char scoreText[64] = "Score: ";
 	char scoreTextData[32] = "\0";
 	_itoa(score, scoreTextData, 10);
 	strcat(scoreText, scoreTextData);
+	char activeTargetsText[32] = "\0";
+	_itoa(activeTargets, activeTargetsText, 10);
+	strcat(scoreText, " / ");
+	strcat(scoreText, activeTargetsText);
 	SDL_Surface* scoreTextSurface = TTF_RenderText_Blended(font, scoreText, 64, {255, 255, 255, SDL_ALPHA_OPAQUE});
 	SDL_Texture* scoreTextTexture = SDL_CreateTextureFromSurface(renderer, scoreTextSurface);
 	SDL_DestroySurface(scoreTextSurface);
@@ -225,11 +191,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_DestroyTexture(scoreTextTexture);
 
 	// score percent
-	// TODO 퍼센트 출력 버그 수정
 	char percentText[5] = { '\0' };
 	_itoa(scorePercent, percentText, 10); // 마지막은 진수임!!!! 건들면안댐
 	strcat(percentText, "%");
-	SDL_Surface* percentTextSurface = TTF_RenderText_Blended(_font, percentText, 64, {255, 255, 255, SDL_ALPHA_OPAQUE});
+	SDL_Surface* percentTextSurface = TTF_RenderText_Blended(font, percentText, 64, {255, 255, 255, SDL_ALPHA_OPAQUE});
 	SDL_Texture* percentTextTexture = SDL_CreateTextureFromSurface(renderer, percentTextSurface);
 	SDL_DestroySurface(percentTextSurface);
 	SDL_FRect percentTextRect = { 256, 0, percentTextTexture->w, percentTextTexture->h };
@@ -268,5 +233,4 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
 	TTF_CloseFont(font);
-	//SDL_DestroyTexture(BackgroundTexture);
 }

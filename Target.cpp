@@ -29,7 +29,6 @@ void Map::getDataFromFile(const char* fileDirName)
 		char cData = '\0';
 		cData = getc(rawData);
 		this->data[i] = cData - '0'; // convert character to integer
-		//SDL_Log("data[%d] = %d", i, this->data[i]);
 	}
 	fclose(rawData);
 }
