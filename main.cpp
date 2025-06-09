@@ -225,6 +225,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_DestroyTexture(scoreTextTexture);
 
 	// score percent
+	// TODO 퍼센트 출력 버그 수정
 	char percentText[5] = { '\0' };
 	_itoa(scorePercent, percentText, 10); // 마지막은 진수임!!!! 건들면안댐
 	strcat(percentText, "%");
