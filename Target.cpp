@@ -41,25 +41,25 @@ void Map::setPosFromData(int index, Target& target, int* activeTargets)
 	case 1: // y=0
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
-		target.rect.y = 0;
+		target.rect.y = 64; // basic offset
 		*activeTargets += 1;
 		break;
 	case 2: // y=128
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
-		target.rect.y = 128;
+		target.rect.y = 128 + 64;
 		*activeTargets += 1;
 		break;
 	case 3: // y = WINDOW_HEIGHT - 256
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
-		target.rect.y = WINDOW_HEIGHT - 256;
+		target.rect.y = WINDOW_HEIGHT - 256 - 64;
 		*activeTargets += 1;
 		break;
 	case 4: // y = WINDOW_HEIGHT - 128
 		target.OnScreen = true;
 		target.rect.x = WINDOW_WIDTH + (index * 128);
-		target.rect.y = WINDOW_HEIGHT - 128;
+		target.rect.y = WINDOW_HEIGHT - 128 - 64;
 		*activeTargets += 1;
 		break;
 	case 0:

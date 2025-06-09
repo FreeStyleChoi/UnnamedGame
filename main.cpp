@@ -1,5 +1,3 @@
-// TODO 점수가 표적 맞출떄 한번만 올라가게 만들기!!!
-
 #define SDL_MAIN_USE_CALLBACKS 1
 #define _CRT_SECURE_NO_WARNINGS
 #include "Player.h"
@@ -37,9 +35,12 @@ FVector2 mousePos;
 Map targetMap{ 0 };
 Target target[INT16_MAX]{ 0 };
 int activeTargets;
-int score;
 
-TTF_Font* scoreFont = NULL;
+int score;
+int scorePercent;
+
+TTF_Font* font = NULL;
+TTF_Font* _font = NULL;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -50,7 +51,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		return SDL_APP_FAILURE;
 	}
 
-	if (!SDL_CreateWindowAndRenderer("Unnamed Game", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
+	if (!SDL_CreateWindowAndRenderer("Unnamed Game", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
 		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
@@ -59,13 +60,18 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		SDL_Log("Couldn't initialize TTF: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
-	scoreFont = TTF_OpenFont("./asset/font.ttf", 64);
-	if (scoreFont == NULL)
+	font = TTF_OpenFont("./asset/font.ttf", 64);
+	_font = TTF_OpenFont("./asset/font.ttf", 64);
+	if (font == NULL)
 	{
 		SDL_Log("asdf");
 		return SDL_APP_FAILURE;
 	}
-
+	if (_font == NULL)
+	{
+		SDL_Log("asdf");
+		return SDL_APP_FAILURE;
+	}
 	//SDL_Surface* tmpSurface = IMG_Load("./asset/background.jpg");
 	//BackgroundTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
 	//SDL_DestroySurface(tmpSurface);
@@ -178,7 +184,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 	}
 
-	SDL_Log("score: %d | %f%%", score, ((float)score / (float)activeTargets) * 100.0);
+	scorePercent = ((float)score / (float)activeTargets) * 100.0;
+	SDL_Log("score: %d | %d%%", score, scorePercent);
 
 	// mouse
 	SDL_GetMouseState(&mousePos.x, &mousePos.y);
@@ -205,19 +212,29 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[0]);
 	//SDL_RenderTexture(renderer, BackgroundTexture, NULL, &BackgroundRect[1]);
 
-	//char t[8] = "Score: ";
-	//char t2[6] = "\0";
-	//_itoa(score, t2, 6);
-	//char* scoreText;
-	//scoreText = strcat(t, t2);
-	// TODO 점수 화면에 출력하기
-	char scoreText[32] = "Score: ";
-	SDL_Surface* textSurface = TTF_RenderText_Blended(scoreFont, scoreText, 50, {255, 255, 255, SDL_ALPHA_OPAQUE});
-	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-	SDL_DestroySurface(textSurface);
-	SDL_FRect textRect = { 256, 256, textTexture->w, textTexture->h };
-	SDL_RenderTexture(renderer, textTexture, NULL, &textRect);
-	SDL_DestroyTexture(textTexture);
+	// score
+	char scoreText[64] = "Score: ";
+	char scoreTextData[32] = "\0";
+	_itoa(score, scoreTextData, 10);
+	strcat(scoreText, scoreTextData);
+	SDL_Surface* scoreTextSurface = TTF_RenderText_Blended(font, scoreText, 64, {255, 255, 255, SDL_ALPHA_OPAQUE});
+	SDL_Texture* scoreTextTexture = SDL_CreateTextureFromSurface(renderer, scoreTextSurface);
+	SDL_DestroySurface(scoreTextSurface);
+	SDL_FRect scoreTextRect = { 0, 0, scoreTextTexture->w, scoreTextTexture->h };
+	SDL_RenderTexture(renderer, scoreTextTexture, NULL, &scoreTextRect);
+	SDL_DestroyTexture(scoreTextTexture);
+
+	// score percent
+	char percentText[5] = { '\0' };
+	_itoa(scorePercent, percentText, 10); // 마지막은 진수임!!!! 건들면안댐
+	strcat(percentText, "%");
+	SDL_Surface* percentTextSurface = TTF_RenderText_Blended(_font, percentText, 64, {255, 255, 255, SDL_ALPHA_OPAQUE});
+	SDL_Texture* percentTextTexture = SDL_CreateTextureFromSurface(renderer, percentTextSurface);
+	SDL_DestroySurface(percentTextSurface);
+	SDL_FRect percentTextRect = { 256, 0, percentTextTexture->w, percentTextTexture->h };
+	SDL_RenderTexture(renderer, percentTextTexture, NULL, &percentTextRect);
+	SDL_DestroyTexture(percentTextTexture);
+	
 
 	for (int i = 0; i < targetMap.length; i++)
 	{
@@ -249,7 +266,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-	TTF_CloseFont(scoreFont);
+	TTF_CloseFont(font);
 	//SDL_DestroyTexture(BackgroundTexture);
 }
-
