@@ -79,7 +79,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	score = 0;
 	activeTargets = 0;
 
-	targetMap.getDataFromFile("./asset./map.txt");
+	targetMap.getDataFromFile("./asset./testingMap.txt");
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		target[i].OnScreen = true;
@@ -156,7 +156,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	}
 
 	scorePercent = ((float)score / (float)activeTargets) * 100.0;
-	SDL_Log("score: %d | %d%%", score, scorePercent);
 
 	// mouse
 	SDL_GetMouseState(&mousePos.x, &mousePos.y);
@@ -194,11 +193,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	char percentText[5] = { '\0' };
 	_itoa(scorePercent, percentText, 10); // 마지막은 진수임!!!! 건들면안댐
 	strcat(percentText, "%");
-	SDL_Log("%s\n", percentText);
 	SDL_Surface* percentTextSurface = TTF_RenderText_Blended(font, percentText, 5, {255, 255, 255, SDL_ALPHA_OPAQUE});
 	SDL_Texture* percentTextTexture = SDL_CreateTextureFromSurface(renderer, percentTextSurface);
 	SDL_DestroySurface(percentTextSurface);
-	SDL_FRect percentTextRect = { 256, 64, percentTextTexture->w, percentTextTexture->h };
+	SDL_FRect percentTextRect = { 256, 0, percentTextTexture->w, percentTextTexture->h };
 	SDL_RenderTexture(renderer, percentTextTexture, NULL, &percentTextRect);
 	SDL_DestroyTexture(percentTextTexture);
 	
