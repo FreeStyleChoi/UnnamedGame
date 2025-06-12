@@ -81,7 +81,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	score = 0;
 	activeTargets = 0;
 
-	targetMap.getDataFromFile("./asset./testingMap.txt");
+	targetMap.getDataFromFile("./asset/map.txt");
 	for (int i = 0; i < targetMap.length; i++)
 	{
 		target[i].OnScreen = true;
@@ -97,8 +97,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 			target[i].rect.x = WINDOW_WIDTH;
 		}
 	}
-	SDL_Log("%d", activeTargets);
-
 
 	return SDL_APP_CONTINUE; 
 }

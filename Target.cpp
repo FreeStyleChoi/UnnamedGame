@@ -22,7 +22,6 @@ void Map::getDataFromFile(const char* fileDirName)
 	}
 	else
 		fscanf(rawData, "%5d", &this->length);
-	SDL_Log("Map length: %d", this->length);
 	fseek(rawData, 2, SEEK_CUR);
 	for (int i = 0; i < this->length; i++)
 	{
@@ -64,6 +63,8 @@ void Map::setPosFromData(int index, Target& target, int* activeTargets)
 	case 0:
 	default:
 		target.OnScreen = false;
+		target.rect.x = -100; // offscreen
+		target.rect.y = -100; // offscreen
 		break;
 	}
 }
