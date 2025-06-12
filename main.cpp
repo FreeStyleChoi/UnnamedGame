@@ -11,6 +11,8 @@
 #include <cstring>
 #include <iostream>
 
+// TODO 스타트 화면, 맵 여러개, 끝나면 다시 스타트 화면, 온라인 플레이 개발
+
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
